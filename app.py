@@ -15,19 +15,50 @@ labels = [
     "talk.politics.mideast","talk.politics.misc","talk.religion.misc"
 ]
 
-# UI
-st.title("🚀 AI Text Classifier")
-st.markdown("### Classify any text into categories instantly")
+# page config
+st.set_page_config(page_title="AI Support Ticket Classifier", layout="centered")
 
-text = st.text_area("✍️ Enter your text here", height=150)
+# sidebar
+st.sidebar.title("⚙️ AI Tool")
+st.sidebar.write("Support Ticket Classifier v1")
 
-if st.button("🔍 Predict Category"):
+# main UI
+st.title("🎫 AI Support Ticket Classifier")
+st.markdown("Automatically categorize customer support messages using AI")
+
+# example button
+if st.button("✨ Try Example"):
+    st.session_state.text = "My internet is not working properly since morning"
+
+# input
+text = st.text_area("✍️ Enter support ticket", height=150, key="text")
+
+# history
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+# predict
+if st.button("🔍 Classify Ticket"):
     if text.strip() == "":
-        st.warning("⚠️ Please enter some text")
+        st.warning("⚠️ Please enter a support message")
     else:
         vec = vectorizer.transform([text])
         pred = model.predict(vec)[0]
-        st.success(f"✅ Category: {labels[pred]}")
+        probs = model.predict_proba(vec)
+        confidence = max(probs[0]) * 100
+
+        category = labels[pred]
+
+        st.success(f"✅ Category: {category}")
+        st.info(f"Confidence: {confidence:.2f}%")
+
+        # save history
+        st.session_state.history.append((text, category))
+
+# show history
+if st.session_state.history:
+    st.markdown("### �
+
 
 
 
