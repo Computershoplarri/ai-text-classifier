@@ -57,7 +57,10 @@ if st.button("🔍 Classify Ticket"):
 
 # show history
 if st.session_state.history:
-    st.markdown("### �
+    st.markdown("### 🕒 Recent Predictions")
+    for item in st.session_state.history[-5:][::-1]:
+        st.write(f"📌 {item[0]} → **{item[1]}**")
+
 
 
 
