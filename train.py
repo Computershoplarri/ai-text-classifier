@@ -2,7 +2,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 import pickle
 
-# dataset (improved)
 texts = [
     # billing
     "I want a refund for my order",
@@ -44,18 +43,16 @@ labels = [
     "spam","spam","spam","spam","spam","spam"
 ]
 
-# vectorizer
 vectorizer = TfidfVectorizer()
 X = vectorizer.fit_transform(texts)
 
-# model
 model = LogisticRegression(max_iter=1000)
 model.fit(X, labels)
 
-# save
 pickle.dump(model, open("model.pkl", "wb"))
 pickle.dump(vectorizer, open("vectorizer.pkl", "wb"))
 
 print("✅ Model trained and saved")
+
 
 
