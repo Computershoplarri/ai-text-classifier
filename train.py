@@ -1,39 +1,44 @@
+from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
+from sklearn.svm import LinearSVC
+from sklearn.calibration import CalibratedClassifierCV
 import pickle
 
+# -----------------------------
+# DATASET (expandable structure)
+# -----------------------------
 texts = [
     # billing
     "I want a refund for my order",
-    "I was charged twice for my subscription",
-    "Payment deducted but service not activated",
-    "Refund has not been processed yet",
-    "Wrong billing amount charged",
-    "Invoice shows incorrect price",
+    "I was charged twice",
+    "Payment failed but money deducted",
+    "Incorrect invoice generated",
+    "Need refund immediately",
+    "Billing issue with subscription",
 
     # technical
-    "My app keeps crashing on startup",
-    "Internet connection is not working",
-    "Unable to login to my account",
-    "Website is loading very slowly",
-    "There is a bug in your software",
-    "Server error when I try to open dashboard",
+    "App is crashing on startup",
+    "Unable to login",
+    "Server error showing",
+    "Internet not working properly",
+    "Website is too slow",
+    "Bug in dashboard",
 
     # sales
-    "I want to purchase your product",
-    "Can you share pricing details?",
-    "Do you offer any discounts?",
-    "I am interested in your service",
-    "What is the cost of your plan?",
-    "Tell me more about your features",
+    "I want pricing details",
+    "Do you offer discounts?",
+    "I want to buy your product",
+    "Tell me about your plans",
+    "What is cost of service?",
+    "Need subscription info",
 
     # spam
-    "Win money now click this link",
-    "You have been selected for a free gift",
-    "Claim your prize now",
-    "Earn cash fast from home",
-    "Limited time offer click here",
-    "Congratulations you won a reward"
+    "Win money now click link",
+    "Claim your free prize",
+    "Earn cash fast online",
+    "Limited offer click here",
+    "You are selected for reward",
+    "Free gift waiting for you"
 ]
 
 labels = [
@@ -43,16 +48,33 @@ labels = [
     "spam","spam","spam","spam","spam","spam"
 ]
 
-vectorizer = TfidfVectorizer()
-X = vectorizer.fit_transform(texts)
+# -----------------------------
+# PRODUCTION MODEL PIPELINE
+# -----------------------------
 
-model = LogisticRegression(max_iter=1000)
-model.fit(X, labels)
+vectorizer = TfidfVectorizer(
+    ngram_range=(1,2),
+    max_features=5000
+)
 
-pickle.dump(model, open("model.pkl", "wb"))
-pickle.dump(vectorizer, open("vectorizer.pkl", "wb"))
+base_model = LinearSVC()
 
-print("✅ Model trained and saved")
+# calibrated model gives probability (confidence)
+model = CalibratedClassifierCV(base_model)
+
+pipeline = Pipeline([
+    ("vectorizer", vectorizer),
+    ("classifier", model)
+])
+
+# train
+pipeline.fit(texts, labels)
+
+# save model
+pickle.dump(pipeline, open("model.pkl", "wb"))
+
+print("✅ Production model trained successfully")
+
 
 
 
