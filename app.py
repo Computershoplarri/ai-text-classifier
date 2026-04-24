@@ -5,16 +5,6 @@ import streamlit as st
 model = pickle.load(open("model.pkl", "rb"))
 vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
-# labels
-labels = [
-    "alt.atheism","comp.graphics","comp.os.ms-windows.misc",
-    "comp.sys.ibm.pc.hardware","comp.sys.mac.hardware","comp.windows.x",
-    "misc.forsale","rec.autos","rec.motorcycles","rec.sport.baseball",
-    "rec.sport.hockey","sci.crypt","sci.electronics","sci.med",
-    "sci.space","soc.religion.christian","talk.politics.guns",
-    "talk.politics.mideast","talk.politics.misc","talk.religion.misc"
-]
-
 # page config
 st.set_page_config(page_title="AI Support Ticket Classifier", layout="centered")
 
@@ -47,20 +37,17 @@ if st.button("🔍 Classify Ticket"):
         probs = model.predict_proba(vec)
         confidence = max(probs[0]) * 100
 
-        category = labels[pred]
-
-        st.success(f"✅ Category: {category}")
+        st.success(f"✅ Category: {pred}")
         st.info(f"Confidence: {confidence:.2f}%")
 
         # save history
-        st.session_state.history.append((text, category))
+        st.session_state.history.append((text, pred))
 
 # show history
 if st.session_state.history:
     st.markdown("### 🕒 Recent Predictions")
     for item in st.session_state.history[-5:][::-1]:
         st.write(f"📌 {item[0]} → **{item[1]}**")
-
 
 
 
