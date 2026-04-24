@@ -9,10 +9,14 @@ vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 st.set_page_config(page_title="AI Support Ticket Classifier", layout="centered")
 
 st.title("🎫 AI Support Ticket Classifier")
-st.markdown("Classify customer support tickets into categories using AI")
+st.markdown("Automatically classify support tickets into categories")
+
+# example
+if st.button("✨ Try Example"):
+    st.session_state.text = "I was charged twice for my order"
 
 # input
-text = st.text_area("✍️ Enter support ticket", height=150)
+text = st.text_area("✍️ Enter support ticket", height=150, key="text")
 
 # history
 if "history" not in st.session_state:
@@ -26,18 +30,15 @@ if st.button("🔍 Classify Ticket"):
         vec = vectorizer.transform([text])
         pred = model.predict(vec)[0]
 
-        # probability (confidence)
         probs = model.predict_proba(vec)
         confidence = max(probs[0]) * 100
 
-        # show result
         st.success(f"✅ Category: {pred}")
         st.info(f"Confidence: {confidence:.2f}%")
 
-        # save history
         st.session_state.history.append((text, pred))
 
-# history section
+# history display
 if st.session_state.history:
     st.markdown("### 🕒 Recent Predictions")
     for msg, cat in st.session_state.history[-5:][::-1]:
