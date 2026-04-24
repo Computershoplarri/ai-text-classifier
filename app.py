@@ -5,23 +5,14 @@ import streamlit as st
 model = pickle.load(open("model.pkl", "rb"))
 vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
-# page config
+# UI config
 st.set_page_config(page_title="AI Support Ticket Classifier", layout="centered")
 
-# sidebar
-st.sidebar.title("⚙️ AI Tool")
-st.sidebar.write("Support Ticket Classifier v1")
-
-# main UI
 st.title("🎫 AI Support Ticket Classifier")
-st.markdown("Automatically categorize customer support messages using AI")
-
-# example button
-if st.button("✨ Try Example"):
-    st.session_state.text = "My internet is not working properly since morning"
+st.markdown("Classify customer support tickets into categories using AI")
 
 # input
-text = st.text_area("✍️ Enter support ticket", height=150, key="text")
+text = st.text_area("✍️ Enter support ticket", height=150)
 
 # history
 if "history" not in st.session_state:
@@ -30,24 +21,28 @@ if "history" not in st.session_state:
 # predict
 if st.button("🔍 Classify Ticket"):
     if text.strip() == "":
-        st.warning("⚠️ Please enter a support message")
+        st.warning("Please enter a message")
     else:
         vec = vectorizer.transform([text])
         pred = model.predict(vec)[0]
+
+        # probability (confidence)
         probs = model.predict_proba(vec)
         confidence = max(probs[0]) * 100
 
+        # show result
         st.success(f"✅ Category: {pred}")
         st.info(f"Confidence: {confidence:.2f}%")
 
         # save history
         st.session_state.history.append((text, pred))
 
-# show history
+# history section
 if st.session_state.history:
     st.markdown("### 🕒 Recent Predictions")
-    for item in st.session_state.history[-5:][::-1]:
-        st.write(f"📌 {item[0]} → **{item[1]}**")
+    for msg, cat in st.session_state.history[-5:][::-1]:
+        st.write(f"📌 {msg} → **{cat}**")
+
 
 
 
